@@ -77,7 +77,7 @@
         <div id="levelDisplay">Level: 1</div>
         <div id="livesDisplay">Lives: ❤️❤️❤️</div>
         <canvas id="gameCanvas" width="400" height="600"></canvas>
-        <div id="instructions">Use ← → Arrow Keys or A/D to move | Collect power-ups!</div>
+        <div id="instructions">Use ← → Arrow Keys or A/D to move | SPACE to pause | Collect power-ups!</div>
     </div>
 
     <script>
@@ -116,7 +116,7 @@
         };
 
         // Game state
-        let gameState = 'start'; // 'start', 'playing', 'gameover', 'levelUp'
+        let gameState = 'start'; // 'start', 'playing', 'paused', 'gameover', 'levelUp'
         let score = 0;
         let highScore = localStorage.getItem('crazyCarHighScore') || 0;
         let gameSpeed = 5;
@@ -166,6 +166,13 @@
                 if (e.key === ' ' || e.key === 'Enter') {
                     startGame();
                 }
+                return;
+            }
+
+            // Pause toggle
+            if (e.key === ' ' && (gameState === 'playing' || gameState === 'paused')) {
+                e.preventDefault();
+                gameState = gameState === 'playing' ? 'paused' : 'playing';
                 return;
             }
 
@@ -748,6 +755,26 @@
             ctx.fillText('Press SPACE or ENTER to Restart', canvas.width / 2, canvas.height / 2 + 90);
         }
 
+        function drawPauseScreen() {
+            ctx.fillStyle = 'rgba(0, 0, 0, 0.7)';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            // Pause icon (two vertical bars)
+            ctx.fillStyle = '#fff';
+            ctx.fillRect(canvas.width / 2 - 35, canvas.height / 2 - 40, 20, 80);
+            ctx.fillRect(canvas.width / 2 + 15, canvas.height / 2 - 40, 20, 80);
+
+            // PAUSED text
+            ctx.fillStyle = '#fff';
+            ctx.font = 'bold 48px Arial';
+            ctx.textAlign = 'center';
+            ctx.fillText('PAUSED', canvas.width / 2, canvas.height / 2 + 70);
+
+            // Instructions
+            ctx.font = '20px Arial';
+            ctx.fillText('Press SPACE to Resume', canvas.width / 2, canvas.height / 2 + 110);
+        }
+
         function render() {
             drawRoad();
             drawCoins();
@@ -762,6 +789,8 @@
                 drawGameOverScreen();
             } else if (gameState === 'levelUp') {
                 drawLevelUpScreen();
+            } else if (gameState === 'paused') {
+                drawPauseScreen();
             }
         }
 
