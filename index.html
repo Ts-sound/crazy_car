@@ -1,0 +1,420 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Crazy Car</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            font-family: 'Arial', sans-serif;
+        }
+
+        #gameContainer {
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        #scoreDisplay {
+            color: white;
+            font-size: 24px;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+        }
+
+        #highScore {
+            color: #ffd700;
+            font-size: 18px;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+        }
+
+        canvas {
+            border: 5px solid #333;
+            border-radius: 10px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+        }
+
+        #instructions {
+            color: white;
+            margin-top: 15px;
+            text-align: center;
+            font-size: 14px;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.5);
+        }
+    </style>
+</head>
+<body>
+    <div id="gameContainer">
+        <div id="scoreDisplay">Score: 0</div>
+        <div id="highScore">High Score: 0</div>
+        <canvas id="gameCanvas" width="400" height="600"></canvas>
+        <div id="instructions">Use ← → Arrow Keys or A/D to move</div>
+    </div>
+
+    <script>
+        const canvas = document.getElementById('gameCanvas');
+        const ctx = canvas.getContext('2d');
+        const scoreDisplay = document.getElementById('scoreDisplay');
+        const highScoreDisplay = document.getElementById('highScore');
+
+        // Game constants
+        const LANE_COUNT = 3;
+        const LANE_WIDTH = canvas.width / LANE_COUNT;
+        const PLAYER_WIDTH = 60;
+        const PLAYER_HEIGHT = 100;
+        const OBSTACLE_WIDTH = 60;
+        const OBSTACLE_HEIGHT = 100;
+        const COIN_SIZE = 30;
+
+        // Game state
+        let gameState = 'start'; // 'start', 'playing', 'gameover'
+        let score = 0;
+        let highScore = localStorage.getItem('crazyCarHighScore') || 0;
+        let gameSpeed = 5;
+        let lastSpeedIncrease = 0;
+
+        // Player
+        let player = {
+            lane: 1, // 0, 1, 2 (left, center, right)
+            x: LANE_WIDTH * 1.5 - PLAYER_WIDTH / 2,
+            y: canvas.height - PLAYER_HEIGHT - 20,
+            targetX: LANE_WIDTH * 1.5 - PLAYER_WIDTH / 2
+        };
+
+        // Obstacles
+        let obstacles = [];
+        let obstacleTimer = 0;
+        let obstacleInterval = 60; // frames between obstacles
+
+        // Coins
+        let coins = [];
+        let coinTimer = 0;
+        let coinInterval = 120; // frames between coins
+
+        // Road lines
+        let roadLines = [];
+        for (let i = 0; i < 6; i++) {
+            roadLines.push({ y: i * 120 });
+        }
+
+        // Load high score display
+        highScoreDisplay.textContent = `High Score: ${highScore}`;
+
+        // Input handling
+        document.addEventListener('keydown', (e) => {
+            if (gameState === 'start' || gameState === 'gameover') {
+                if (e.key === ' ' || e.key === 'Enter') {
+                    startGame();
+                }
+                return;
+            }
+
+            if (gameState === 'playing') {
+                if ((e.key === 'ArrowLeft' || e.key === 'a' || e.key === 'A') && player.lane > 0) {
+                    player.lane--;
+                    player.targetX = player.lane * LANE_WIDTH + LANE_WIDTH / 2 - PLAYER_WIDTH / 2;
+                }
+                if ((e.key === 'ArrowRight' || e.key === 'd' || e.key === 'D') && player.lane < LANE_COUNT - 1) {
+                    player.lane++;
+                    player.targetX = player.lane * LANE_WIDTH + LANE_WIDTH / 2 - PLAYER_WIDTH / 2;
+                }
+            }
+        });
+
+        function startGame() {
+            gameState = 'playing';
+            score = 0;
+            gameSpeed = 5;
+            lastSpeedIncrease = 0;
+            player.lane = 1;
+            player.x = LANE_WIDTH * 1.5 - PLAYER_WIDTH / 2;
+            player.targetX = player.x;
+            obstacles = [];
+            coins = [];
+            obstacleTimer = 0;
+            coinTimer = 0;
+            scoreDisplay.textContent = `Score: ${score}`;
+        }
+
+        function spawnObstacle() {
+            const lane = Math.floor(Math.random() * LANE_COUNT);
+            const x = lane * LANE_WIDTH + LANE_WIDTH / 2 - OBSTACLE_WIDTH / 2;
+            const colors = ['#ff6b6b', '#4ecdc4', '#ffe66d', '#95e1d3'];
+            const color = colors[Math.floor(Math.random() * colors.length)];
+            obstacles.push({
+                x: x,
+                y: -OBSTACLE_HEIGHT,
+                width: OBSTACLE_WIDTH,
+                height: OBSTACLE_HEIGHT,
+                color: color
+            });
+        }
+
+        function spawnCoin() {
+            const lane = Math.floor(Math.random() * LANE_COUNT);
+            const x = lane * LANE_WIDTH + LANE_WIDTH / 2 - COIN_SIZE / 2;
+            coins.push({
+                x: x,
+                y: -COIN_SIZE,
+                size: COIN_SIZE,
+                collected: false
+            });
+        }
+
+        function update() {
+            if (gameState !== 'playing') return;
+
+            // Smooth player movement
+            player.x += (player.targetX - player.x) * 0.2;
+
+            // Update road lines
+            roadLines.forEach(line => {
+                line.y += gameSpeed;
+                if (line.y > canvas.height) {
+                    line.y = -120;
+                }
+            });
+
+            // Spawn obstacles
+            obstacleTimer++;
+            if (obstacleTimer >= obstacleInterval) {
+                spawnObstacle();
+                obstacleTimer = 0;
+                // Decrease interval slightly as game progresses
+                if (obstacleInterval > 30) {
+                    obstacleInterval -= 0.1;
+                }
+            }
+
+            // Spawn coins
+            coinTimer++;
+            if (coinTimer >= coinInterval) {
+                spawnCoin();
+                coinTimer = 0;
+            }
+
+            // Update obstacles
+            obstacles.forEach((obstacle, index) => {
+                obstacle.y += gameSpeed;
+
+                // Collision detection with player
+                if (checkCollision(player.x, player.y, PLAYER_WIDTH, PLAYER_HEIGHT,
+                    obstacle.x, obstacle.y, obstacle.width, obstacle.height)) {
+                    gameOver();
+                }
+
+                // Remove obstacles that are off screen
+                if (obstacle.y > canvas.height) {
+                    obstacles.splice(index, 1);
+                    score += 10;
+                    scoreDisplay.textContent = `Score: ${score}`;
+                }
+            });
+
+            // Update coins
+            coins.forEach((coin, index) => {
+                coin.y += gameSpeed;
+
+                // Collision detection with player
+                if (!coin.collected && checkCollision(player.x, player.y, PLAYER_WIDTH, PLAYER_HEIGHT,
+                    coin.x, coin.y, coin.size, coin.size)) {
+                    coin.collected = true;
+                    score += 100;
+                    scoreDisplay.textContent = `Score: ${score}`;
+                    coins.splice(index, 1);
+                }
+
+                // Remove coins that are off screen
+                if (coin.y > canvas.height) {
+                    coins.splice(index, 1);
+                }
+            });
+
+            // Increase speed every 500 points
+            if (score - lastSpeedIncrease >= 500) {
+                gameSpeed += 0.5;
+                lastSpeedIncrease = score;
+            }
+
+            // Score increases over time
+            score++;
+            scoreDisplay.textContent = `Score: ${score}`;
+        }
+
+        function checkCollision(x1, y1, w1, h1, x2, y2, w2, h2) {
+            return x1 < x2 + w2 &&
+                   x1 + w1 > x2 &&
+                   y1 < y2 + h2 &&
+                   y1 + h1 > y2;
+        }
+
+        function gameOver() {
+            gameState = 'gameover';
+            if (score > highScore) {
+                highScore = score;
+                localStorage.setItem('crazyCarHighScore', highScore);
+                highScoreDisplay.textContent = `High Score: ${highScore}`;
+            }
+        }
+
+        function drawRoad() {
+            // Road background
+            ctx.fillStyle = '#333';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            // Road edges
+            ctx.fillStyle = '#fff';
+            ctx.fillRect(0, 0, 10, canvas.height);
+            ctx.fillRect(canvas.width - 10, 0, 10, canvas.height);
+
+            // Lane dividers
+            ctx.fillStyle = '#fff';
+            roadLines.forEach(line => {
+                ctx.fillRect(canvas.width / 3 - 5, line.y, 10, 60);
+                ctx.fillRect((canvas.width / 3) * 2 - 5, line.y, 10, 60);
+            });
+        }
+
+        function drawPlayer() {
+            // Car body
+            ctx.fillStyle = '#3498db';
+            ctx.fillRect(player.x, player.y, PLAYER_WIDTH, PLAYER_HEIGHT);
+
+            // Car details
+            ctx.fillStyle = '#2980b9';
+            ctx.fillRect(player.x + 5, player.y + 10, PLAYER_WIDTH - 10, 20); // Windshield
+            ctx.fillRect(player.x + 5, player.y + 60, PLAYER_WIDTH - 10, 15); // Rear window
+
+            // Wheels
+            ctx.fillStyle = '#333';
+            ctx.fillRect(player.x - 5, player.y + 15, 10, 20);
+            ctx.fillRect(player.x + PLAYER_WIDTH - 5, player.y + 15, 10, 20);
+            ctx.fillRect(player.x - 5, player.y + 65, 10, 20);
+            ctx.fillRect(player.x + PLAYER_WIDTH - 5, player.y + 65, 10, 20);
+
+            // Headlights
+            ctx.fillStyle = '#f1c40f';
+            ctx.beginPath();
+            ctx.arc(player.x + 10, player.y, 5, 0, Math.PI * 2);
+            ctx.arc(player.x + PLAYER_WIDTH - 10, player.y, 5, 0, Math.PI * 2);
+            ctx.fill();
+        }
+
+        function drawObstacles() {
+            obstacles.forEach(obstacle => {
+                // Car body
+                ctx.fillStyle = obstacle.color;
+                ctx.fillRect(obstacle.x, obstacle.y, obstacle.width, obstacle.height);
+
+                // Car details
+                ctx.fillStyle = '#333';
+                ctx.fillRect(obstacle.x + 5, obstacle.y + 10, obstacle.width - 10, 20);
+                ctx.fillRect(obstacle.x + 5, obstacle.y + 60, obstacle.width - 10, 15);
+
+                // Wheels
+                ctx.fillStyle = '#333';
+                ctx.fillRect(obstacle.x - 5, obstacle.y + 15, 10, 20);
+                ctx.fillRect(obstacle.x + obstacle.width - 5, obstacle.y + 15, 10, 20);
+                ctx.fillRect(obstacle.x - 5, obstacle.y + 65, 10, 20);
+                ctx.fillRect(obstacle.x + obstacle.width - 5, obstacle.y + 65, 10, 20);
+            });
+        }
+
+        function drawCoins() {
+            coins.forEach(coin => {
+                ctx.fillStyle = '#f1c40f';
+                ctx.beginPath();
+                ctx.arc(coin.x + coin.size / 2, coin.y + coin.size / 2, coin.size / 2, 0, Math.PI * 2);
+                ctx.fill();
+
+                ctx.fillStyle = '#f39c12';
+                ctx.beginPath();
+                ctx.arc(coin.x + coin.size / 2, coin.y + coin.size / 2, coin.size / 3, 0, Math.PI * 2);
+                ctx.fill();
+
+                ctx.fillStyle = '#f1c40f';
+                ctx.font = 'bold 16px Arial';
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'middle';
+                ctx.fillText('$', coin.x + coin.size / 2, coin.y + coin.size / 2);
+            });
+        }
+
+        function drawStartScreen() {
+            ctx.fillStyle = 'rgba(0, 0, 0, 0.7)';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            ctx.fillStyle = '#fff';
+            ctx.font = 'bold 48px Arial';
+            ctx.textAlign = 'center';
+            ctx.fillText('CRAZY CAR', canvas.width / 2, canvas.height / 2 - 50);
+
+            ctx.font = '24px Arial';
+            ctx.fillText('Press SPACE or ENTER to Start', canvas.width / 2, canvas.height / 2 + 20);
+
+            ctx.font = '18px Arial';
+            ctx.fillText('Use ← → Arrow Keys or A/D to Move', canvas.width / 2, canvas.height / 2 + 60);
+            ctx.fillText('Avoid cars, collect coins!', canvas.width / 2, canvas.height / 2 + 90);
+        }
+
+        function drawGameOverScreen() {
+            ctx.fillStyle = 'rgba(0, 0, 0, 0.7)';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            ctx.fillStyle = '#e74c3c';
+            ctx.font = 'bold 48px Arial';
+            ctx.textAlign = 'center';
+            ctx.fillText('GAME OVER', canvas.width / 2, canvas.height / 2 - 60);
+
+            ctx.fillStyle = '#fff';
+            ctx.font = '32px Arial';
+            ctx.fillText(`Score: ${score}`, canvas.width / 2, canvas.height / 2);
+
+            if (score >= highScore && score > 0) {
+                ctx.fillStyle = '#f1c40f';
+                ctx.font = '24px Arial';
+                ctx.fillText('NEW HIGH SCORE!', canvas.width / 2, canvas.height / 2 + 40);
+            }
+
+            ctx.fillStyle = '#fff';
+            ctx.font = '20px Arial';
+            ctx.fillText('Press SPACE or ENTER to Restart', canvas.width / 2, canvas.height / 2 + 90);
+        }
+
+        function render() {
+            drawRoad();
+            drawCoins();
+            drawObstacles();
+            drawPlayer();
+
+            if (gameState === 'start') {
+                drawStartScreen();
+            } else if (gameState === 'gameover') {
+                drawGameOverScreen();
+            }
+        }
+
+        function gameLoop() {
+            update();
+            render();
+            requestAnimationFrame(gameLoop);
+        }
+
+        // Start the game loop
+        gameLoop();
+    </script>
+</body>
+</html>
