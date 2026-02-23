@@ -46,8 +46,16 @@ class PowerUp extends Entity {
     static createRandom(laneWidth) {
         const lane = Math.floor(Math.random() * LANE_COUNT);
         const x = lane * laneWidth + laneWidth / 2 - POWERUP_SIZE / 2;
-        const types = Object.keys(POWERUP_TYPES);
-        const type = types[Math.floor(Math.random() * types.length)];
+        
+        // Weighted random selection - Extra Life less common
+        const rand = Math.random();
+        let type;
+        if (rand < 0.08) type = 'EXTRA_LIFE';        // 8% chance
+        else if (rand < 0.30) type = 'SHIELD';        // 22% chance
+        else if (rand < 0.52) type = 'SLOW_MOTION';   // 22% chance
+        else if (rand < 0.74) type = 'MAGNET';        // 22% chance
+        else type = 'DOUBLE_SCORE';                   // 26% chance
+        
         return new PowerUp(x, -POWERUP_SIZE, type);
     }
 }

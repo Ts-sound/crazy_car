@@ -24,12 +24,12 @@ class Input {
             if (e.key === 'ArrowRight' || e.key === 'd' || e.key === 'D') {
                 eventBus.publish('INPUT_RIGHT');
             }
-            // Game state
+            // Game state (start/restart)
             if (e.key === ' ' || e.key === 'Enter') {
                 eventBus.publish('INPUT_ACTION');
             }
-            // Pause
-            if (e.key === ' ' && (e.ctrlKey || e.metaKey)) {
+            // Pause toggle (space during gameplay)
+            if (e.key === 'p' || e.key === 'P' || e.key === 'Escape') {
                 eventBus.publish('INPUT_PAUSE');
             }
         });

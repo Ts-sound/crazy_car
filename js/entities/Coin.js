@@ -1,10 +1,10 @@
 import Entity from './Entity.js';
-import { COIN_SIZE, LANE_COUNT, LANE_WIDTH } from '../constants.js';
+import { COIN_SIZE, LANE_COUNT, LANE_WIDTH, COLLISION } from '../constants.js';
 
 class Coin extends Entity {
     constructor(x, y) {
         super(x, y, COIN_SIZE, COIN_SIZE);
-        this.value = 100;
+        this.value = COLLISION.coinValue;
         this.rotation = 0;
     }
 

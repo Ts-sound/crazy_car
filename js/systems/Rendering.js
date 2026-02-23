@@ -1,4 +1,4 @@
-import { POWERUP_TYPES, CANVAS_WIDTH, CANVAS_HEIGHT } from '../constants.js';
+import { LEVELS, POWERUP_TYPES, CANVAS_WIDTH, CANVAS_HEIGHT } from '../constants.js';
 
 class Rendering {
     constructor(canvas) {
@@ -8,6 +8,31 @@ class Rendering {
 
     clear() {
         this.ctx.clearRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
+    }
+
+    drawRoad(levelConfig) {
+        const ctx = this.ctx;
+        ctx.fillStyle = levelConfig.roadColor;
+        ctx.fillRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
+        ctx.fillStyle = levelConfig.lineColor;
+        ctx.fillRect(0, 0, 10, CANVAS_HEIGHT);
+        ctx.fillRect(CANVAS_WIDTH - 10, 0, 10, CANVAS_HEIGHT);
+    }
+
+    drawRoadLines(roadLines, levelConfig) {
+        const ctx = this.ctx;
+        roadLines.forEach(line => {
+            ctx.fillRect(CANVAS_WIDTH / 3 - 5, line.y, 10, 60);
+            ctx.fillRect((CANVAS_WIDTH / 3) * 2 - 5, line.y, 10, 60);
+        });
+        if (levelConfig.name === 'Expert') {
+            ctx.shadowColor = '#9b59b6';
+            ctx.shadowBlur = 20;
+            ctx.strokeStyle = '#9b59b6';
+            ctx.lineWidth = 2;
+            ctx.strokeRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
+            ctx.shadowBlur = 0;
+        }
     }
 
     drawEntity(entity) {
@@ -39,16 +64,6 @@ class Rendering {
         }
 
         player.draw(this.ctx);
-
-        if (effects.speedBoost) {
-            this.ctx.fillStyle = 'rgba(230, 126, 34, 0.3)';
-            this.ctx.fillRect(
-                player.x - 10,
-                player.y + player.height,
-                player.width + 20,
-                20
-            );
-        }
 
         if (effects.magnet) {
             this.ctx.strokeStyle = '#2ecc71';

@@ -12,7 +12,7 @@
 - Visual effects (animated road, car designs, coins)
 - Three game states (start, playing, game over)
 - **3-level progression system** with unique themes
-- **6 power-ups** with unique effects and durations
+- **5 power-ups** with unique effects and durations
 - **Lives system** with 3 starting lives
 - **Level-up animations** and transitions
 - **Active power-up display** with progress bars
@@ -22,7 +22,9 @@
 - Object pooling for performance
 - Event bus for decoupled communication
 - Touch controls for mobile devices
-- All original gameplay features preserved
+- DOM UI sync (score, level, lives in top bar)
+- Unit tests (67 passing)
+- Single-file production build
 
 ## What's Left to Build
 - None - game is complete and fully enhanced
@@ -41,3 +43,7 @@ None - game is fully functional
 - Added level system for structured progression
 - Implemented power-ups to increase gameplay variety and strategy
 - Lives system to make game more forgiving and enjoyable
+- Refactored from monolithic 800-line file to modular architecture
+- Centralized game configuration in constants.js
+- Added weighted power-up spawn rates for better game balance
+- Removed Speed Boost power-up (simplified gameplay)

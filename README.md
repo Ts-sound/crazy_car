@@ -26,12 +26,11 @@ Crazy Car is a fast-paced arcade driving game where you navigate through traffic
     - Maximum obstacle density
     - Ultimate challenge for skilled players
 
-### ⚡ 6 Power-Ups
+### ⚡ 5 Power-Ups
 
 | Power-Up | Effect | Duration |
 |----------|--------|----------|
 | 🛡️ **Shield** | Invincibility - pass through obstacles safely | 5 seconds |
-| ⚡ **Speed Boost** | 50% faster scoring | 5 seconds |
 | ⏰ **Slow Motion** | Obstacles move 50% slower | 5 seconds |
 | 🧲 **Magnet** | Attracts nearby coins | 5 seconds |
 | 2x **Double Score** | All points doubled | 8 seconds |
@@ -57,7 +56,8 @@ Crazy Car is a fast-paced arcade driving game where you navigate through traffic
 
 ### Controls
 - **← → Arrow Keys** or **A/D** - Move between lanes
-- **SPACE** or **ENTER** - Start game / Restart
+- **SPACE** or **ENTER** - Start game / Restart / Pause toggle
+- **P** or **ESC** - Pause / Resume
 
 ### Gameplay
 1. Press SPACE or ENTER to start
@@ -82,18 +82,32 @@ Crazy Car is a fast-paced arcade driving game where you navigate through traffic
 
 ### Running the Game
 
-Simply open `index.html` in your web browser:
+**Option 1: Use pre-built single file**
 
 ```bash
-# Option 1: Double-click index.html
-# Option 2: Use open command
-open index.html  # macOS
-start index.html # Windows
-xdg-open index.html # Linux
+# Open the built single-file version
+open dist/index.html  # macOS
+start dist/index.html # Windows
+xdg-open dist/index.html # Linux
+```
 
-# Option 3: Use a local server (optional)
-python -m http.server 8000
-# Then navigate to http://localhost:8000
+**Option 2: Build yourself**
+
+```bash
+# Install dependencies
+npm install
+
+# Build single HTML file
+npm run build
+
+# Open dist/index.html in browser
+```
+
+**Option 3: Development mode**
+
+```bash
+npm run dev      # Start dev server with hot reload
+npm run test     # Run unit tests
 ```
 
 ## 📊 Game Mechanics
@@ -105,8 +119,7 @@ python -m http.server 8000
 
 ### Power-Up Strategy
 - **Shield**: Use when surrounded by obstacles or in tight spots
-- **Speed Boost**: Activate during clear roads for maximum scoring
-- **Slow Motion**: Perfect for dodging密集 traffic
+- **Slow Motion**: Perfect for dodging dense traffic
 - **Magnet**: Combine with Double Score for massive coin collection
 - **Double Score**: Activate when approaching many coins or obstacles
 - **Extra Life**: Collect whenever available for safety net
@@ -117,7 +130,23 @@ python -m http.server 8000
 - Obstacles move faster in higher levels
 - Use power-ups strategically to navigate difficult patterns
 
-## 🛠️ Technical Details
+## 🧪 Testing
+
+```bash
+# Run tests
+npm test
+
+# Run tests once
+npm run test:run
+```
+
+Unit tests cover:
+- EventBus (publish/subscribe)
+- ObjectPool (acquire/release)
+- Collision detection (AABB)
+- PowerUpManager (effects, timers)
+- Player movement
+- Entity base class
 
 - **Language**: HTML5, CSS3, JavaScript (ES6+)
 - **Rendering**: HTML5 Canvas API
@@ -174,10 +203,33 @@ crazy_car/
 └── memory-bank/        # Project documentation
 ```
 
+### Game Configuration
+
+All game parameters are centralized in `js/constants.js`:
+
+```javascript
+// Game speed
+BASE_GAME_SPEED = 2
+
+// Spawn intervals (frames @60fps)
+SPAWN_RATES: {
+  obstacle: { base: 150, min: 80, difficultyScale: 0.08 },
+  coin: { base: 100 },
+  powerUp: { base: 120 }
+}
+
+// Power-up spawn weights
+EXTRA_LIFE: 8%    // Rare
+SHIELD: 22%
+SLOW_MOTION: 22%
+MAGNET: 22%
+DOUBLE_SCORE: 26%
+```
+
 ### Customization
 - Modify `LEVELS` object to adjust level thresholds and themes
 - Edit `POWERUP_TYPES` to change power-up effects and durations
-- Adjust game speed and spawn rates in the update function
+- Adjust `SPAWN_RATES` to change difficulty
 - Customize colors and visual effects in drawing functions
 
 ## 🎯 Tips for High Scores

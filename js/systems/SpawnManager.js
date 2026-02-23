@@ -2,7 +2,7 @@ import Obstacle from '../entities/Obstacle.js';
 import Coin from '../entities/Coin.js';
 import PowerUp from '../entities/PowerUp.js';
 import ObjectPool from '../utils/ObjectPool.js';
-import { LANE_WIDTH, CANVAS_HEIGHT } from '../constants.js';
+import { LANE_WIDTH, CANVAS_HEIGHT, SPAWN_RATES } from '../constants.js';
 
 class SpawnManager {
     constructor() {
@@ -29,14 +29,14 @@ class SpawnManager {
         this.powerUpTimer = 0;
 
         // Spawn rates (frames)
-        this.obstacleInterval = 60;
-        this.coinInterval = 120;
-        this.powerUpInterval = 200;
+        this.obstacleInterval = SPAWN_RATES.obstacle.base;
+        this.coinInterval = SPAWN_RATES.coin.base;
+        this.powerUpInterval = SPAWN_RATES.powerUp.base;
     }
 
     update(level, frameCount) {
         // Adjust spawn rates based on level
-        const difficultyMultiplier = 1 - (level - 1) * 0.15;
+        const difficultyMultiplier = 1 - (level - 1) * SPAWN_RATES.obstacle.difficultyScale;
 
         this.obstacleTimer++;
         if (this.obstacleTimer >= this.obstacleInterval * difficultyMultiplier) {
@@ -96,8 +96,10 @@ class SpawnManager {
     }
 
     setDifficulty(level) {
-        const baseObstacle = 60;
-        this.obstacleInterval = Math.max(25, baseObstacle - (level - 1) * 15);
+        this.obstacleInterval = Math.max(
+            SPAWN_RATES.obstacle.min,
+            SPAWN_RATES.obstacle.base - (level - 1) * 10
+        );
     }
 }
 

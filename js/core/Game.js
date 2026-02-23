@@ -1,5 +1,5 @@
 import eventBus from './EventBus.js';
-import { LEVELS, BASE_GAME_SPEED, INITIAL_LIVES, CANVAS_HEIGHT } from '../constants.js';
+import { LEVELS, BASE_GAME_SPEED, INITIAL_LIVES, CANVAS_HEIGHT, LEVEL_UP_DURATION, COLLISION } from '../constants.js';
 import Player from '../entities/Player.js';
 import Collision from '../systems/Collision.js';
 import SpawnManager from '../systems/SpawnManager.js';
@@ -9,7 +9,7 @@ import Rendering from '../systems/Rendering.js';
 class Game {
     constructor(canvas) {
         this.canvas = canvas;
-        this.state = 'start'; // start, playing, paused, gameover, levelUp
+        this.state = 'start';
         this.score = 0;
         this.highScore = parseInt(localStorage.getItem('crazyCarHighScore')) || 0;
         this.level = 1;
@@ -17,16 +17,23 @@ class Game {
         this.frameCount = 0;
         this.levelUpTimer = 0;
 
+        // DOM elements
+        this.ui = {
+            score: document.getElementById('scoreDisplay'),
+            highScore: document.getElementById('highScoreDisplay'),
+            level: document.getElementById('levelDisplay'),
+            lives: document.getElementById('livesDisplay')
+        };
+
         // Systems
         this.player = new Player();
         this.spawnManager = new SpawnManager();
         this.powerUpManager = new PowerUpManager();
         this.rendering = new Rendering(canvas);
         this.roadLines = this.createRoadLines();
-
-        // Road line animation
         this.roadLineOffset = 0;
 
+        this.updateUI();
         this.setupEventListeners();
     }
 
@@ -54,14 +61,14 @@ class Game {
         eventBus.subscribe('INPUT_ACTION', () => {
             if (this.state === 'start' || this.state === 'gameover') {
                 this.start();
+            } else if (this.state === 'playing' || this.state === 'paused') {
+                this.state = this.state === 'playing' ? 'paused' : 'playing';
             }
         });
 
         eventBus.subscribe('INPUT_PAUSE', () => {
-            if (this.state === 'playing') {
-                this.state = 'paused';
-            } else if (this.state === 'paused') {
-                this.state = 'playing';
+            if (this.state === 'playing' || this.state === 'paused') {
+                this.state = this.state === 'playing' ? 'paused' : 'playing';
             }
         });
     }
@@ -76,6 +83,15 @@ class Game {
         this.spawnManager.reset();
         this.powerUpManager.reset();
         this.spawnManager.setDifficulty(1);
+        this.updateUI();
+    }
+
+    updateUI() {
+        const levelConfig = LEVELS[this.level];
+        if (this.ui.score) this.ui.score.textContent = `Score: ${this.score}`;
+        if (this.ui.highScore) this.ui.highScore.textContent = `High: ${this.highScore}`;
+        if (this.ui.level) this.ui.level.textContent = `${levelConfig.name}`;
+        if (this.ui.lives) this.ui.lives.textContent = '❤️'.repeat(this.lives);
     }
 
     gameOver() {
@@ -84,6 +100,7 @@ class Game {
             this.highScore = this.score;
             localStorage.setItem('crazyCarHighScore', this.highScore);
         }
+        this.updateUI();
     }
 
     checkLevelUp() {
@@ -91,8 +108,9 @@ class Game {
         if (LEVELS[nextLevel] && this.score >= LEVELS[nextLevel].threshold) {
             this.level = nextLevel;
             this.state = 'levelUp';
-            this.levelUpTimer = 120;
+            this.levelUpTimer = LEVEL_UP_DURATION;
             this.spawnManager.setDifficulty(this.level);
+            this.updateUI();
         }
     }
 
@@ -100,9 +118,11 @@ class Game {
         const entities = this.spawnManager.getAllEntities();
         const effects = {
             shield: this.powerUpManager.hasEffect('shield'),
-            speedBoost: this.powerUpManager.hasEffect('speedBoost'),
             magnet: this.powerUpManager.hasEffect('magnet')
         };
+
+        let livesChanged = false;
+        let scoreChanged = false;
 
         entities.obstacles.forEach((obstacle, index) => {
             if (Collision.check(this.player, obstacle)) {
@@ -112,6 +132,7 @@ class Game {
                         this.powerUpManager.activePowerUps.filter(p => p.effect !== 'shield');
                 } else if (this.lives > 0) {
                     this.lives--;
+                    livesChanged = true;
                     this.spawnManager.obstaclePool.release(obstacle);
                     if (this.lives <= 0) {
                         this.gameOver();
@@ -124,6 +145,7 @@ class Game {
             if (Collision.check(this.player, coin)) {
                 const multiplier = this.powerUpManager.getMultiplier();
                 this.score += coin.value * multiplier;
+                scoreChanged = true;
                 this.spawnManager.coinPool.release(coin);
             }
         });
@@ -134,10 +156,15 @@ class Game {
                 this.spawnManager.powerUpPool.release(powerUp);
 
                 if (result.type === 'INSTANT_LIFE') {
-                    this.lives += result.data.amount;
+                    this.lives++;
+                    livesChanged = true;
                 }
             }
         });
+
+        if (livesChanged || scoreChanged) {
+            this.updateUI();
+        }
     }
 
     update() {
@@ -173,10 +200,12 @@ class Game {
         entities.coins.forEach(c => c.update(1, speed));
         entities.powerUps.forEach(p => p.update(1, speed));
 
+        let obstacleCleared = false;
         entities.obstacles.forEach(o => {
             if (o.isOffScreen(CANVAS_HEIGHT)) {
                 this.spawnManager.obstaclePool.release(o);
-                this.score += 10 * this.powerUpManager.getMultiplier();
+                this.score += COLLISION.obstacleClearPoints * this.powerUpManager.getMultiplier();
+                obstacleCleared = true;
             }
         });
         entities.coins.forEach(c => {
@@ -193,6 +222,11 @@ class Game {
         this.handleCollisions();
 
         this.score += this.powerUpManager.getMultiplier();
+
+        // Update UI for score changes
+        if (obstacleCleared || this.frameCount % 10 === 0) {
+            this.updateUI();
+        }
 
         this.checkLevelUp();
     }
@@ -213,18 +247,9 @@ class Game {
 
         const effects = {
             shield: this.powerUpManager.hasEffect('shield'),
-            speedBoost: this.powerUpManager.hasEffect('speedBoost'),
             magnet: this.powerUpManager.hasEffect('magnet')
         };
         this.rendering.drawPlayer(this.player, effects);
-
-        this.rendering.drawUI(
-            this.score,
-            this.highScore,
-            this.level,
-            this.lives,
-            levelConfig
-        );
 
         this.rendering.drawActivePowerUps(this.powerUpManager.getActiveList());
 

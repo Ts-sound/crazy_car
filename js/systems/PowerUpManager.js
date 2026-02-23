@@ -62,7 +62,6 @@ class PowerUpManager {
 
     getSpeedModifier() {
         let modifier = 1;
-        if (this.hasEffect('speedBoost')) modifier *= 1.5;
         if (this.hasEffect('slowMotion')) modifier *= 0.5;
         return modifier;
     }

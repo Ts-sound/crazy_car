@@ -1,8 +1,7 @@
 import Game from './core/Game.js';
 import Input from './core/Input.js';
 
-// Initialize when DOM is ready
-document.addEventListener('DOMContentLoaded', () => {
+function init() {
     const canvas = document.getElementById('gameCanvas');
     
     if (!canvas) {
@@ -20,4 +19,12 @@ document.addEventListener('DOMContentLoaded', () => {
     game.gameLoop();
 
     console.log('Crazy Car initialized!');
-});
+}
+
+// Initialize when DOM is ready
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', init);
+} else {
+    // DOM already loaded (script in head with defer/inline)
+    init();
+}
