@@ -184,6 +184,8 @@ class Game {
 
         const speed = BASE_GAME_SPEED * LEVELS[this.level].speedMultiplier * 
                       this.powerUpManager.getSpeedModifier();
+        const speedMultiplier = this.powerUpManager.getSpeedModifier();
+        
         this.roadLines.forEach(line => {
             line.y += speed;
             if (line.y > CANVAS_HEIGHT) {
@@ -191,7 +193,7 @@ class Game {
             }
         });
 
-        this.spawnManager.update(this.level, this.frameCount);
+        this.spawnManager.update(this.level, this.frameCount, speedMultiplier);
 
         const expired = this.powerUpManager.update();
 

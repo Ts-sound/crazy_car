@@ -34,24 +34,30 @@ class SpawnManager {
         this.powerUpInterval = SPAWN_RATES.powerUp.base;
     }
 
-    update(level, frameCount) {
+    update(level, frameCount, speedMultiplier = 1) {
         // Adjust spawn rates based on level
         const difficultyMultiplier = 1 - (level - 1) * SPAWN_RATES.obstacle.difficultyScale;
 
+        // Adjust spawn intervals with game speed
+        // When speedMultiplier < 1 (Slow Motion), increase intervals proportionally
+        const effectiveObstacleInterval = this.obstacleInterval * difficultyMultiplier / speedMultiplier;
+        const effectiveCoinInterval = this.coinInterval / speedMultiplier;
+        const effectivePowerUpInterval = this.powerUpInterval / speedMultiplier;
+
         this.obstacleTimer++;
-        if (this.obstacleTimer >= this.obstacleInterval * difficultyMultiplier) {
+        if (this.obstacleTimer >= effectiveObstacleInterval) {
             this.spawnObstacle();
             this.obstacleTimer = 0;
         }
 
         this.coinTimer++;
-        if (this.coinTimer >= this.coinInterval) {
+        if (this.coinTimer >= effectiveCoinInterval) {
             this.spawnCoin();
             this.coinTimer = 0;
         }
 
         this.powerUpTimer++;
-        if (this.powerUpTimer >= this.powerUpInterval) {
+        if (this.powerUpTimer >= effectivePowerUpInterval) {
             this.spawnPowerUp();
             this.powerUpTimer = 0;
         }
