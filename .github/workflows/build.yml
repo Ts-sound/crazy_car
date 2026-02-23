@@ -5,6 +5,9 @@ on:
     tags:
       - 'v[0-9]+.[0-9]+.[0-9]+*'  # v0.1.0, v1.2.3-beta, etc.
 
+permissions:
+  contents: write
+
 jobs:
   build-and-release:
     runs-on: ubuntu-latest
@@ -32,6 +35,22 @@ jobs:
         uses: softprops/action-gh-release@v2
         with:
           files: dist/index.html
-          generate_release_notes: true
+          name: Release ${{ github.ref_name }}
+          body: |
+            ## Crazy Car ${{ github.ref_name }}
+            
+            Single-file HTML5 driving game.
+            
+            ### How to Play
+            1. Download `index.html`
+            2. Open in any modern browser
+            3. Use Arrow Keys or A/D to move
+            4. Press P or ESC to pause
+            
+            ### Features
+            - 3 levels (Beginner → Intermediate → Expert)
+            - 5 power-ups with unique effects
+            - Touch controls for mobile
+            - 67 unit tests passing
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
