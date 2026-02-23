@@ -83,5 +83,6 @@
         ]
     ],
     "markdown-preview-enhanced.mathjaxV3ScriptSrc": "http://127.0.0.1:8001/mathjax/es5/tex-mml-chtml.js",
-    "markdown-preview-enhanced.scrollSync": true
+    "markdown-preview-enhanced.scrollSync": true,
+    "svn.ignoreMissingSvnWarning": true
 }

@@ -145,21 +145,33 @@ Game Loop (60fps)
 
 ## 📝 Development
 
-### Project Structure
+## 📁 Project Structure
 
-```bash
+```
 crazy_car/
-├── index.html          # Main game file
-├── README.md           # Documentation
-├── LICENSE             # License file
-├── .gitignore          # Git ignore rules
+├── index.html          # HTML structure
+├── style.css           # Styles
+├── js/
+│   ├── main.js         # Entry point
+│   ├── constants.js    # Game configuration
+│   ├── core/
+│   │   ├── Game.js     # Game controller
+│   │   ├── Input.js    # Input handling
+│   │   └── EventBus.js # Event system
+│   ├── entities/
+│   │   ├── Entity.js   # Base class
+│   │   ├── Player.js
+│   │   ├── Obstacle.js
+│   │   ├── Coin.js
+│   │   └── PowerUp.js
+│   ├── systems/
+│   │   ├── Rendering.js
+│   │   ├── Collision.js
+│   │   ├── SpawnManager.js
+│   │   └── PowerUpManager.js
+│   └── utils/
+│       └── ObjectPool.js
 └── memory-bank/        # Project documentation
-    ├── projectbrief.md
-    ├── productContext.md
-    ├── techContext.md
-    ├── systemPatterns.md
-    ├── activeContext.md
-    └── progress.md
 ```
 
 ### Customization
