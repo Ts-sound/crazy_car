@@ -172,74 +172,75 @@ Game Loop (60fps)
     └── UI Overlay
 ```
 
-## 📝 Development
-
 ## 📁 Project Structure
 
 ```
 crazy_car/
-├── index.html          # HTML structure
-├── style.css           # Styles
-├── js/
-│   ├── main.js         # Entry point
-│   ├── constants.js    # Game configuration
-│   ├── core/
-│   │   ├── Game.js     # Game controller
-│   │   ├── Input.js    # Input handling
-│   │   └── EventBus.js # Event system
-│   ├── entities/
-│   │   ├── Entity.js   # Base class
-│   │   ├── Player.js
-│   │   ├── Obstacle.js
-│   │   ├── Coin.js
-│   │   └── PowerUp.js
-│   ├── systems/
-│   │   ├── Rendering.js
-│   │   ├── Collision.js
-│   │   ├── SpawnManager.js
-│   │   └── PowerUpManager.js
-│   └── utils/
-│       └── ObjectPool.js
-└── memory-bank/        # Project documentation
+├── src/                    # Source code
+│   ├── core/              # Core systems (Game, Input, EventBus)
+│   ├── entities/          # Game entities (Player, Enemy, Coin, etc.)
+│   ├── systems/           # Game systems (Rendering, Collision, etc.)
+│   ├── utils/             # Utilities (ObjectPool)
+│   ├── constants.js       # Game configuration
+│   ├── main.js            # Entry point
+│   ├── index.html         # HTML file
+│   └── style.css          # Styles
+├── tests/                  # Unit tests
+├── config/                 # Build configuration
+│   ├── vite.config.js
+│   └── vitest.config.js
+├── scripts/                # Automation scripts
+│   ├── build.sh           # Build project
+│   ├── test.sh            # Run tests
+│   └── release.sh         # Create release
+├── docs/                   # Documentation
+│   ├── plans/             # Design documents
+│   └── sessions/          # Session notes
+├── memory-bank/            # Project context
+├── dist/                   # Build output
+├── .editorconfig           # Code style
+├── CHANGELOG.md            # Version history
+├── package.json
+└── README.md
 ```
 
-### Game Configuration
+## 🛠️ Development
 
-All game parameters are centralized in `js/constants.js`:
+### Setup
 
-```javascript
-// Game speed
-BASE_GAME_SPEED = 2
+```bash
+# Install dependencies
+npm install
 
-// Spawn intervals (frames @60fps)
-SPAWN_RATES: {
-  obstacle: { base: 150, min: 80, difficultyScale: 0.08 },
-  coin: { base: 100 },
-  powerUp: { base: 120 }
-}
+# Run development server
+npm run dev
 
-// Power-up spawn weights
-EXTRA_LIFE: 8%    // Rare
-SHIELD: 22%
-SLOW_MOTION: 22%
-MAGNET: 22%
-DOUBLE_SCORE: 26%
+# Run tests
+npm run test
+
+# Build for production
+npm run build
 ```
 
-### Customization
-- Modify `LEVELS` object to adjust level thresholds and themes
-- Edit `POWERUP_TYPES` to change power-up effects and durations
-- Adjust `SPAWN_RATES` to change difficulty
-- Customize colors and visual effects in drawing functions
+### Scripts
 
-## 🎯 Tips for High Scores
+```bash
+./scripts/build.sh      # Build single HTML file
+./scripts/test.sh       # Run all tests
+./scripts/release.sh v1.0.1  # Create new release
+```
 
-1. **Prioritize survival** - Don't take unnecessary risks
-2. **Use power-ups strategically** - Save them for difficult moments
-3. **Combine power-ups** - Magnet + Double Score = massive points
-4. **Learn patterns** - Obstacle spawn patterns become predictable
-5. **Stay centered** - Middle lane offers most flexibility
-6. **Watch for power-ups** - They spawn regularly, collect them
+## 🚀 CI/CD
+
+GitHub Actions automatically builds and creates releases on tagged commits:
+
+```bash
+# Create a release
+git tag v1.0.0
+git push origin v1.0.0
+
+# Triggers: tests → build → GitHub Release with dist/index.html
+```
 
 ## 📄 License
 
@@ -259,6 +260,7 @@ Have fun playing Crazy Car! Try to beat your high score and reach the Expert lev
 
 ---
 
-**Version**: 1.0  
-**Last Updated**: 2024  
-**Status**: ✅ Complete and Fully Functional
+**Version**: 1.0.0  
+**Last Updated**: 2026-02-27  
+**Status**: ✅ Complete and Fully Functional  
+**Tests**: ✅ 67 passing
