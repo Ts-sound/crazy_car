@@ -1,6 +1,11 @@
 import Entity from './Entity.js';
 import { POWERUP_SIZE, LANE_COUNT, LANE_WIDTH, POWERUP_TYPES } from '../constants.js';
-import { weightedPick } from '../utils/shuffle.js';
+import { WeightedPool } from '../utils/shuffle.js';
+
+// Shared weighted pool for power-up types (configurable pool size)
+const TYPES = ['EXTRA_LIFE', 'SHIELD', 'SLOW_MOTION', 'MAGNET', 'DOUBLE_SCORE'];
+const WEIGHTS = [8, 22, 22, 22, 26];  // Current weights (unchanged)
+const pool = new WeightedPool(TYPES, WEIGHTS, 100);  // Default pool size: 100
 
 class PowerUp extends Entity {
     constructor(x, y, type) {
@@ -47,13 +52,15 @@ class PowerUp extends Entity {
     static createRandom(laneWidth) {
         const lane = Math.floor(Math.random() * LANE_COUNT);
         const x = lane * laneWidth + laneWidth / 2 - POWERUP_SIZE / 2;
-        
-        // Weighted selection with preserved weights
-        const types = ['EXTRA_LIFE', 'SHIELD', 'SLOW_MOTION', 'MAGNET', 'DOUBLE_SCORE'];
-        const weights = [8, 22, 22, 22, 26];  // Current weights (unchanged)
-        const type = weightedPick(types, weights);
-        
+        const type = pool.pick();  // Use shuffled pool for fair distribution
         return new PowerUp(x, -POWERUP_SIZE, type);
+    }
+
+    /**
+     * Reset the power-up pool (call on game restart)
+     */
+    static resetPool() {
+        pool.reset();
     }
 }
 
