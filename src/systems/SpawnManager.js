@@ -96,7 +96,7 @@ class SpawnManager {
         };
     }
 
-    reset() {
+    reset(printStats = false) {
         this.obstaclePool.releaseAll();
         this.coinPool.releaseAll();
         this.powerUpPool.releaseAll();
@@ -104,7 +104,7 @@ class SpawnManager {
         this.coinTimer = 0;
         this.powerUpTimer = 0;
         this.laneSeq.reset();
-        PowerUp.resetPool();  // Reset power-up pool on game restart
+        PowerUp.resetPool(printStats);  // Reset power-up pool on game restart
     }
 
     setDifficulty(level) {

@@ -100,6 +100,9 @@ class Game {
             this.highScore = this.score;
             localStorage.setItem('crazyCarHighScore', this.highScore);
         }
+        // Print power-up stats on game over
+        this.spawnManager.reset(true);  // printStats = true
+        this.powerUpManager.reset();
         this.updateUI();
     }
 

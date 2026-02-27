@@ -148,12 +148,13 @@ export class WeightedPool {
   }
 
   /**
-   * Reset pool to beginning
+   * Reset pool to beginning (call on game start)
+   * @param {boolean} printStats - Whether to print stats before reset (default: false)
    */
-  reset() {
-    // Print final stats before reset
-    if (this.totalPicks > 0) {
-      this.printStats('Game Reset - Final Stats');
+  reset(printStats = false) {
+    // Optionally print stats before reset (e.g., on game over)
+    if (printStats && this.totalPicks > 0) {
+      this.printStats('Game Over - Final Stats');
     }
     
     // Reset stats

@@ -57,10 +57,11 @@ class PowerUp extends Entity {
     }
 
     /**
-     * Reset the power-up pool (call on game restart)
+     * Reset the power-up pool (call on game start)
+     * @param {boolean} printStats - Whether to print stats before reset
      */
-    static resetPool() {
-        pool.reset();
+    static resetPool(printStats = false) {
+        pool.reset(printStats);
     }
 
     /**
