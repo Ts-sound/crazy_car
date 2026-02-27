@@ -173,6 +173,12 @@ export class WeightedPool {
     console.log(`\n=== ${message} ===`);
     console.log(`Total: ${this.totalPicks}`);
     
+    if (this.totalPicks === 0) {
+      console.log('No power-ups generated yet. Start the game and collect power-ups!');
+      console.log('========================\n');
+      return;
+    }
+    
     const emojis = {
       'EXTRA_LIFE': '❤️',
       'SHIELD': '🛡️',
