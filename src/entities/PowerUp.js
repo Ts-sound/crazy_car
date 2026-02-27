@@ -1,5 +1,6 @@
 import Entity from './Entity.js';
 import { POWERUP_SIZE, LANE_COUNT, LANE_WIDTH, POWERUP_TYPES } from '../constants.js';
+import { weightedPick } from '../utils/shuffle.js';
 
 class PowerUp extends Entity {
     constructor(x, y, type) {
@@ -47,14 +48,10 @@ class PowerUp extends Entity {
         const lane = Math.floor(Math.random() * LANE_COUNT);
         const x = lane * laneWidth + laneWidth / 2 - POWERUP_SIZE / 2;
         
-        // Weighted random selection - Extra Life less common
-        const rand = Math.random();
-        let type;
-        if (rand < 0.08) type = 'EXTRA_LIFE';        // 8% chance
-        else if (rand < 0.30) type = 'SHIELD';        // 22% chance
-        else if (rand < 0.52) type = 'SLOW_MOTION';   // 22% chance
-        else if (rand < 0.74) type = 'MAGNET';        // 22% chance
-        else type = 'DOUBLE_SCORE';                   // 26% chance
+        // Weighted selection with preserved weights
+        const types = ['EXTRA_LIFE', 'SHIELD', 'SLOW_MOTION', 'MAGNET', 'DOUBLE_SCORE'];
+        const weights = [8, 22, 22, 22, 26];  // Current weights (unchanged)
+        const type = weightedPick(types, weights);
         
         return new PowerUp(x, -POWERUP_SIZE, type);
     }

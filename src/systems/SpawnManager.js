@@ -2,6 +2,7 @@ import Obstacle from '../entities/Obstacle.js';
 import Coin from '../entities/Coin.js';
 import PowerUp from '../entities/PowerUp.js';
 import ObjectPool from '../utils/ObjectPool.js';
+import { LaneSequence } from '../utils/shuffle.js';
 import { LANE_WIDTH, CANVAS_HEIGHT, SPAWN_RATES } from '../constants.js';
 
 class SpawnManager {
@@ -32,6 +33,9 @@ class SpawnManager {
         this.obstacleInterval = SPAWN_RATES.obstacle.base;
         this.coinInterval = SPAWN_RATES.coin.base;
         this.powerUpInterval = SPAWN_RATES.powerUp.base;
+
+        // Lane sequence for fair short-term distribution
+        this.laneSeq = new LaneSequence(3);
     }
 
     update(level, frameCount, speedMultiplier = 1) {
@@ -64,21 +68,21 @@ class SpawnManager {
     }
 
     spawnObstacle() {
-        const lane = Math.floor(Math.random() * 3);
+        const lane = this.laneSeq.getNext();
         const x = lane * LANE_WIDTH + LANE_WIDTH / 2 - 30;
         const obstacle = this.obstaclePool.acquire(x, -100);
         obstacle.active = true;
     }
 
     spawnCoin() {
-        const lane = Math.floor(Math.random() * 3);
+        const lane = this.laneSeq.getNext();
         const x = lane * LANE_WIDTH + LANE_WIDTH / 2 - 15;
         const coin = this.coinPool.acquire(x, -30);
         coin.active = true;
     }
 
     spawnPowerUp() {
-        const lane = Math.floor(Math.random() * 3);
+        const lane = this.laneSeq.getNext();
         const x = lane * LANE_WIDTH + LANE_WIDTH / 2 - 17.5;
         const powerUp = this.powerUpPool.acquire(x, -35);
         powerUp.active = true;
@@ -99,6 +103,7 @@ class SpawnManager {
         this.obstacleTimer = 0;
         this.coinTimer = 0;
         this.powerUpTimer = 0;
+        this.laneSeq.reset();
     }
 
     setDifficulty(level) {
