@@ -16,6 +16,7 @@
     "files.exclude": {
         ".gitignore": false,
         "build": true,
+        "node_modules": true,
         "run": true,
         "log": true
     },

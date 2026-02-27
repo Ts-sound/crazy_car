@@ -3,7 +3,7 @@ name: Build and Release
 on:
   push:
     tags:
-      - 'v[0-9]+.[0-9]+.[0-9]+*'  # v0.1.0, v1.2.3-beta, etc.
+    - 'v[0-9]+.[0-9]+.[0-9]+*' # v0.1.0, v1.2.3-beta, etc.
 
 permissions:
   contents: write
@@ -13,44 +13,37 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
+    - name: Checkout code
+      uses: actions/checkout@v4
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: '20'
-          cache: 'npm'
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '20'
+        cache: 'npm'
 
-      - name: Install dependencies
-        run: npm ci
+    - name: Install dependencies
+      run: npm ci
 
-      - name: Run tests
-        run: npm run test:run
+    - name: Run tests
+      run: npm run test:run
 
-      - name: Build single HTML file
-        run: npm run build
+    - name: Build single HTML file
+      run: npm run build
 
-      - name: Create Release
-        uses: softprops/action-gh-release@v2
-        with:
-          files: dist/index.html
-          name: Release ${{ github.ref_name }}
-          body: |
-            ## Crazy Car ${{ github.ref_name }}
-            
-            Single-file HTML5 driving game.
-            
-            ### How to Play
-            1. Download `index.html`
-            2. Open in any modern browser
-            3. Use Arrow Keys or A/D to move
-            4. Press P or ESC to pause
-            
-            ### Features
-            - 3 levels (Beginner → Intermediate → Expert)
-            - 5 power-ups with unique effects
-            - Touch controls for mobile
-            - 67 unit tests passing
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    - name: Create Release
+      uses: softprops/action-gh-release@v2
+      with:
+        files: dist/index.html
+        name: Release ${{ github.ref_name }}
+        body: |
+          ## Crazy Car ${{ github.ref_name }}
+
+          ### How to Play
+          1. Download `index.html`
+          2. Open in any modern browser
+          3. Use Arrow Keys or A/D to move
+          4. Press P or ESC to pause
+
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
