@@ -1,4 +1,5 @@
 import eventBus from './EventBus.js';
+import PowerUp from '../entities/PowerUp.js';
 
 class Input {
     constructor() {
@@ -31,6 +32,11 @@ class Input {
             // Pause toggle (space during gameplay)
             if (e.key === 'p' || e.key === 'P' || e.key === 'Escape') {
                 eventBus.publish('INPUT_PAUSE');
+            }
+
+            // Print PowerUp stats
+            if (e.key === 'e' || e.key === 'E') {
+                PowerUp.printStats('Manual Stats (E key)');
             }
         });
 

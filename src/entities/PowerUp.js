@@ -5,7 +5,7 @@ import { WeightedPool } from '../utils/shuffle.js';
 // Shared weighted pool for power-up types (configurable pool size)
 const TYPES = ['EXTRA_LIFE', 'SHIELD', 'SLOW_MOTION', 'MAGNET', 'DOUBLE_SCORE'];
 const WEIGHTS = [8, 22, 22, 22, 26];  // Current weights (unchanged)
-const pool = new WeightedPool(TYPES, WEIGHTS, 100);  // Default pool size: 100
+const pool = new WeightedPool(TYPES, WEIGHTS, 50);  // Default pool size: 50
 
 class PowerUp extends Entity {
     constructor(x, y, type) {
@@ -61,6 +61,21 @@ class PowerUp extends Entity {
      */
     static resetPool() {
         pool.reset();
+    }
+
+    /**
+     * Print power-up generation statistics
+     * @param {string} message - Message to display
+     */
+    static printStats(message) {
+        pool.printStats(message);
+    }
+
+    /**
+     * Get current pool instance (for stats access)
+     */
+    static getPool() {
+        return pool;
     }
 }
 

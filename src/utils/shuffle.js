@@ -71,14 +71,22 @@ export class WeightedPool {
   /**
    * @param {Array} items - Items to pick from
    * @param {Array} weights - Corresponding weights (integers)
-   * @param {number} poolSize - Size of the pool (default 100)
+   * @param {number} poolSize - Size of the pool (default 50)
    */
-  constructor(items, weights, poolSize = 100) {
+  constructor(items, weights, poolSize = 50) {
     this.items = items;
     this.weights = weights;
     this.poolSize = poolSize;
     this.pool = [];
     this.index = 0;
+    
+    // Statistics tracking
+    this.stats = {};
+    this.totalPicks = 0;
+    items.forEach(item => {
+      this.stats[item] = 0;
+    });
+    
     this.refill();
   }
 
@@ -127,17 +135,62 @@ export class WeightedPool {
    */
   pick() {
     if (this.index >= this.pool.length) {
+      // Print stats before refill (every poolSize picks)
+      if (this.totalPicks > 0) {
+        this.printStats(`Pool exhausted (picked ${this.totalPicks})`);
+      }
       this.refill();
     }
-    return this.pool[this.index++];
+    const item = this.pool[this.index++];
+    this.stats[item]++;
+    this.totalPicks++;
+    return item;
   }
 
   /**
    * Reset pool to beginning
    */
   reset() {
+    // Print final stats before reset
+    if (this.totalPicks > 0) {
+      this.printStats('Game Reset - Final Stats');
+    }
+    
+    // Reset stats
+    this.items.forEach(item => {
+      this.stats[item] = 0;
+    });
+    this.totalPicks = 0;
     this.index = 0;
     this.refill();
+  }
+
+  /**
+   * Print statistics to console
+   * @param {string} message - Message to display
+   */
+  printStats(message = 'Power-Up Statistics') {
+    console.log(`\n=== ${message} ===`);
+    console.log(`Total: ${this.totalPicks}`);
+    
+    const emojis = {
+      'EXTRA_LIFE': '❤️',
+      'SHIELD': '🛡️',
+      'SLOW_MOTION': '⏰',
+      'MAGNET': '🧲',
+      'DOUBLE_SCORE': '2x'
+    };
+    
+    console.log('Distribution:');
+    this.items.forEach((type, i) => {
+      const count = this.stats[type];
+      const percentage = this.totalPicks > 0 
+        ? ((count / this.totalPicks) * 100).toFixed(1) 
+        : 0;
+      const expected = this.weights[i];
+      console.log(`  ${emojis[type]} ${type.padEnd(14)}: ${String(count).padEnd(3)} (${percentage}%) [expected: ${expected}%]`);
+    });
+    console.log('========================\n');
   }
 
   /**
@@ -146,5 +199,13 @@ export class WeightedPool {
    */
   remaining() {
     return this.pool.length - this.index;
+  }
+
+  /**
+   * Get current statistics
+   * @returns {Object} - Statistics object
+   */
+  getStats() {
+    return { ...this.stats, totalPicks: this.totalPicks };
   }
 }
