@@ -3,7 +3,7 @@ import Coin from '../entities/Coin.js';
 import PowerUp from '../entities/PowerUp.js';
 import ObjectPool from '../utils/ObjectPool.js';
 import { LaneSequence } from '../utils/shuffle.js';
-import { LANE_WIDTH, CANVAS_HEIGHT, SPAWN_RATES } from '../constants.js';
+import { LANE_WIDTH, CANVAS_HEIGHT, SPAWN_RATES, POWERUP_TYPES } from '../constants.js';
 
 class SpawnManager {
     constructor() {
@@ -20,7 +20,15 @@ class SpawnManager {
         );
         this.powerUpPool = new ObjectPool(
             (x, y) => PowerUp.createRandom(LANE_WIDTH),
-            (obj, x, y) => obj.reset(x, y),
+            (obj, x, y) => {
+                obj.reset(x, y);
+                // Re-select power-up type on reuse to track stats correctly
+                obj.type = PowerUp.getPool().pick();
+                const typeData = POWERUP_TYPES[obj.type];
+                obj.emoji = typeData.emoji;
+                obj.color = typeData.color;
+                obj.name = typeData.name;
+            },
             5
         );
 
