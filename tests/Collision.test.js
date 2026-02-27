@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import Collision from './Collision.js';
+import Collision from '../src/systems/Collision.js';
 
 describe('Collision', () => {
   describe('check', () => {

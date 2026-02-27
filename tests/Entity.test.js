@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import Entity from './Entity.js';
+import Entity from '../src/entities/Entity.js';
 
 describe('Entity', () => {
   describe('constructor', () => {

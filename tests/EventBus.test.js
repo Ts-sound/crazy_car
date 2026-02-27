@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach } from 'vitest';
-import eventBus from './EventBus.js';
+import eventBus from '../src/core/EventBus.js';
 
 describe('EventBus', () => {
   beforeEach(() => {

@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import ObjectPool from './ObjectPool.js';
+import ObjectPool from '../src/utils/ObjectPool.js';
 
 describe('ObjectPool', () => {
   describe('constructor', () => {

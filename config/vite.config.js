@@ -3,16 +3,17 @@ import { resolve } from 'path';
 import { viteSingleFile } from 'vite-plugin-singlefile';
 
 export default defineConfig({
+  root: resolve(__dirname, '../src'),
   test: {
     environment: 'jsdom',
     globals: true,
-    include: ['**/*.test.js'],
+    include: [resolve(__dirname, '../tests/**/*.test.js')],
   },
   build: {
-    outDir: 'dist',
+    outDir: resolve(__dirname, '../dist'),
     rollupOptions: {
       input: {
-        main: resolve(__dirname, 'index.html'),
+        main: resolve(__dirname, '../src/index.html'),
       },
     },
   },

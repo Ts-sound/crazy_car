@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach } from 'vitest';
-import PowerUpManager from './PowerUpManager.js';
+import PowerUpManager from '../src/systems/PowerUpManager.js';
 
 describe('PowerUpManager', () => {
   let manager;

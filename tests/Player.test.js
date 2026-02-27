@@ -1,6 +1,6 @@
 import { describe, it, expect, beforeEach } from 'vitest';
-import Player from './Player.js';
-import { LANE_COUNT, LANE_WIDTH } from '../constants.js';
+import Player from '../src/entities/Player.js';
+import { LANE_COUNT, LANE_WIDTH } from '../src/constants.js';
 
 describe('Player', () => {
   let player;

@@ -3,11 +3,11 @@
   "version": "1.0.0",
   "type": "module",
   "scripts": {
-    "dev": "vite",
-    "build": "vite build",
+    "dev": "vite --config config/vite.config.js",
+    "build": "vite build --config config/vite.config.js",
     "preview": "vite preview",
-    "test": "vitest",
-    "test:run": "vitest run"
+    "test": "vitest --config config/vitest.config.js",
+    "test:run": "vitest run --config config/vitest.config.js"
   },
   "devDependencies": {
     "jsdom": "^24.0.0",

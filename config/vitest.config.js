@@ -1,9 +1,10 @@
 import { defineConfig } from 'vitest/config';
+import { resolve } from 'path';
 
 export default defineConfig({
   test: {
     environment: 'jsdom',
     globals: true,
-    include: ['**/*.test.js'],
+    include: [resolve(__dirname, '../tests/**/*.test.js')],
   },
 });
