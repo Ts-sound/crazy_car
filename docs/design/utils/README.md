@@ -182,6 +182,15 @@ pool.releaseAll();  // On game reset
 - release(): O(1)
 - Elimination: GC pauses during gameplay
 
+**State Transition**:
+```mermaid
+stateDiagram-v2
+    [*] --> Available: create()
+    Available --> Acquired: acquire()
+    Acquired --> Available: release()
+    Acquired --> [*]: game over
+```
+
 ## Interfaces
 
 ### LaneSequence

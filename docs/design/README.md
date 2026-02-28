@@ -151,14 +151,49 @@ classDiagram
     Entity <|-- PowerUp
 ```
 
+## Configuration
+
+关键配置参数 (`src/constants.js`):
+
+### 游戏速度
+| 参数 | 默认值 | 说明 |
+|------|--------|------|
+| `BASE_GAME_SPEED` | 2 | 基础游戏速度（像素/帧） |
+| `LEVELS[n].speedMultiplier` | 1.0/1.2/1.4 | 关卡速度倍率 |
+
+### 生成频率（帧数 @60fps）
+| 参数 | 默认值 | 说明 |
+|------|--------|------|
+| `SPAWN_RATES.obstacle.base` | 150 | 障碍物基础生成间隔 |
+| `SPAWN_RATES.obstacle.min` | 80 | 障碍物最小生成间隔 |
+| `SPAWN_RATES.coin.base` | 100 | 金币生成间隔 |
+| `SPAWN_RATES.powerUp.base` | 120 | 道具生成间隔 |
+
+### 道具权重（WeightedPool 池大小：50）
+| 道具 | 权重 | 每池数量 | 概率 |
+|------|------|---------|------|
+| `EXTRA_LIFE` | 8 | 4 | 8% |
+| `SHIELD` | 22 | 11 | 22% |
+| `SLOW_MOTION` | 22 | 11 | 22% |
+| `MAGNET` | 22 | 11 | 22% |
+| `DOUBLE_SCORE` | 26 | 13 | 26% |
+
+### 关卡阈值
+| 关卡 | 分数阈值 | 路面颜色 |
+|------|---------|---------|
+| Beginner | 0 | 灰色 (#333) |
+| Intermediate | 1000 | 沙漠色 (#d4a574) |
+| Expert | 3000 | 霓虹紫 (#2d1b4e) |
+
 ## Performance Targets
 
 | Metric | Target | Actual |
 |--------|--------|--------|
 | Frame Rate | 60 fps | ✅ 60 fps |
-| Build Size | < 25 KB | ✅ 21.92 KB |
+| Build Size | < 25 KB | ✅ 21.76 KB |
 | Test Coverage | Core systems | ✅ 87 tests |
 | Load Time | < 1s | ✅ Instant |
+| Doc Coverage | All modules | ✅ 5 design docs |
 
 ---
 

@@ -161,6 +161,20 @@ interface Entity {
 
 ## Data Flow
 
+### Entity Lifecycle
+
+```mermaid
+flowchart LR
+    A[SpawnManager.create] --> B[Entity.active=true]
+    B --> C[Game.update]
+    C --> D{Off-screen?}
+    D -->|Yes| E[ObjectPool.release]
+    E --> F[Entity.active=false]
+    F --> B
+```
+
+### Spawn Sequence
+
 ```mermaid
 sequenceDiagram
     participant G as Game

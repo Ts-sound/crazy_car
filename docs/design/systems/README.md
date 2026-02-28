@@ -96,6 +96,21 @@ flowchart LR
     D -->|No| B
 ```
 
+**Spawn Logic**:
+```mermaid
+flowchart TD
+    A[update] --> B{obstacleTimer >= interval?}
+    B -->|Yes| C[spawnObstacle]
+    B -->|No| D{coinTimer >= interval?}
+    D -->|Yes| E[spawnCoin]
+    D -->|No| F{powerUpTimer >= interval?}
+    F -->|Yes| G[spawnPowerUp]
+    F -->|No| H[End]
+    C --> H
+    E --> H
+    G --> H
+```
+
 ### PowerUpManager
 
 **Responsibility**: Track and apply active power-up effects
