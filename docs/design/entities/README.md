@@ -120,6 +120,21 @@ classDiagram
   - MAGNET: 11 (22%)
   - DOUBLE_SCORE: 13 (26%)
 
+**Statistics Tracking**:
+- Tracks every power-up generation
+- Auto-prints every 50 picks (pool exhausted)
+- Manual print: Press 'E' key during gameplay
+- Prints on game over
+- Console output shows distribution vs expected weights
+
+**Public API**:
+```javascript
+PowerUp.createRandom(laneWidth)  // Create with weighted type
+PowerUp.resetPool(printStats)    // Reset on game start/over
+PowerUp.printStats(message)      // Manual stats print
+PowerUp.getPool()                // Access pool instance
+```
+
 ## Interfaces
 
 ### Entity Interface

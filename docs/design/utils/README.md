@@ -115,16 +115,32 @@ seq.getNext(); // Reshuffles, returns new lane
 | DOUBLE_SCORE | 26% | 13 |
 
 **Statistics Tracking**:
-- Tracks picks per type
-- Auto-prints every 50 picks (pool exhausted)
-- Manual print via 'E' key
-- Prints on game over
+- `stats` - Object tracking picks per type
+- `totalPicks` - Total items picked since last reset
+- `printStats(message)` - Console output with emoji and percentages
+- Auto-prints when pool exhausted (every 50 picks)
+- Manual print via `PowerUp.printStats()` (E key in game)
+- Prints on game over with "Game Over - Final Stats"
+
+**Example Output**:
+```
+=== Pool exhausted (picked 50) ===
+Total: 50
+Distribution:
+  ❤️ EXTRA_LIFE   : 4   (8.0%) [expected: 8%]
+  🛡️ SHIELD       : 11  (22.0%) [expected: 22%]
+  ⏰ SLOW_MOTION  : 11  (22.0%) [expected: 22%]
+  🧲 MAGNET       : 11  (22.0%) [expected: 22%]
+  2x DOUBLE_SCORE : 13  (26.0%) [expected: 26%]
+========================
+```
 
 **Example**:
 ```javascript
 const pool = new WeightedPool(types, weights, 50);
-pool.pick();  // Returns weighted item
-pool.printStats();  // Console output
+pool.pick();  // Returns weighted item, tracks stats
+pool.printStats('Manual Check');  // Console output
+pool.reset(true);  // Reset with stats print
 ```
 
 ### ObjectPool
