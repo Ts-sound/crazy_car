@@ -1,3 +1,5 @@
+[English](README.md) | [中文](README.zh-CN.md)
+
 # Crazy Car 🚗
 
 A fun and exciting HTML5 browser-based driving game with multiple levels, power-ups, and strategic gameplay!
